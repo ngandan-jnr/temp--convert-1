@@ -1,7 +1,7 @@
 use clap::{Arg, Command};
 use std::process;
 
-fn 
+fn main() {
     let matches = Command::new("Temperature Converter")
         .version("1.0")
         .author("Your Name")
@@ -26,7 +26,17 @@ fn
     
     let input = matches.get_one::<String>("temperature").unwrap();
     
-    if let Some((temp_c, temp_f, temp_k)) = convert_temperature(input.trim()) {
+    // Parse the temperature and scale
+    let (temp_value, scale) = match parse_temperature(input.trim()) {
+        Some((temp, scale)) => (temp, scale),
+        None => {
+            eprintln!("Invalid input format. Please provide a valid temperature (e.g., 100C, 212F).");
+            process::exit(1);
+        }
+    };
+    
+    // Convert the temperature based on the scale
+    if let Some((temp_c, temp_f, temp_k)) = convert_temperature(temp_value, scale) {
         if matches.contains_id("all") {
             print_converted_temps(temp_c, temp_f, temp_k);
         } else {
@@ -43,15 +53,16 @@ fn
     } else {
         process::exit(1);
     }
+}
 
-
-fn convert_temperature(input: &str) -> Option<(f64, f64, f64)> {
+// Function to parse the temperature input, separating the number and the scale.
+fn parse_temperature(input: &str) -> Option<(f64, char)> {
     if input.len() < 2 {
         eprintln!("Invalid input. Please enter a number followed by 'C', 'F', or 'K'.");
         return None;
     }
 
-    let (num_part, scale) = input.split_at(input.len() - 1);
+    let (num_part, scale) = input.split_at(input.len() - 1); // Split number and scale
     let temp: f64 = match num_part.trim().parse() {
         Ok(n) => n,
         Err(_) => {
@@ -60,20 +71,26 @@ fn convert_temperature(input: &str) -> Option<(f64, f64, f64)> {
         }
     };
 
-    let scale = scale.to_uppercase();
-    let (temp_c, temp_f, temp_k) = match scale.as_str() {
-        "C" => (temp, (temp * 9.0 / 5.0) + 32.0, temp + 273.15),
-        "F" => ((temp - 32.0) * 5.0 / 9.0, temp, (temp - 32.0) * 5.0 / 9.0 + 273.15),
-        "K" => (temp - 273.15, (temp - 273.15) * 9.0 / 5.0 + 32.0, temp),
-        _ => {
-            eprintln!("Invalid scale. Use 'C', 'F', or 'K'.");
-            return None;
-        }
-    };
+    let scale = scale.chars().next().unwrap_or_default().to_uppercase().next().unwrap_or_default();
+    if !['C', 'F', 'K'].contains(&scale) {
+        eprintln!("Invalid scale. Use 'C', 'F', or 'K'.");
+        return None;
+    }
 
-    Some((temp_c, temp_f, temp_k))
+    Some((temp, scale))
 }
 
+// Convert the temperature based on the given scale
+fn convert_temperature(temp: f64, scale: char) -> Option<(f64, f64, f64)> {
+    match scale {
+        'C' => Some((temp, (temp * 9.0 / 5.0) + 32.0, temp + 273.15)),
+        'F' => Some(((temp - 32.0) * 5.0 / 9.0, temp, (temp - 32.0) * 5.0 / 9.0 + 273.15)),
+        'K' => Some((temp - 273.15, (temp - 273.15) * 9.0 / 5.0 + 32.0, temp)),
+        _ => None,
+    }
+}
+
+// Function to print all converted temperatures
 fn print_converted_temps(temp_c: f64, temp_f: f64, temp_k: f64) {
     println!("Temp in C: {:.2}", temp_c);
     println!("Temp in F: {:.2}", temp_f);
