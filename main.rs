@@ -26,7 +26,7 @@ fn main() {
     
     let input = matches.get_one::<String>("temperature").unwrap();
     
-    // Parse the temperature and scale
+
     let (temp_value, scale) = match parse_temperature(input.trim()) {
         Some((temp, scale)) => (temp, scale),
         None => {
@@ -35,7 +35,7 @@ fn main() {
         }
     };
     
-    // Convert the temperature based on the scale
+
     if let Some((temp_c, temp_f, temp_k)) = convert_temperature(temp_value, scale) {
         if matches.contains_id("all") {
             print_converted_temps(temp_c, temp_f, temp_k);
@@ -55,14 +55,14 @@ fn main() {
     }
 }
 
-// Function to parse the temperature input, separating the number and the scale.
+
 fn parse_temperature(input: &str) -> Option<(f64, char)> {
     if input.len() < 2 {
         eprintln!("Invalid input. Please enter a number followed by 'C', 'F', or 'K'.");
         return None;
     }
 
-    let (num_part, scale) = input.split_at(input.len() - 1); // Split number and scale
+    let (num_part, scale) = input.split_at(input.len() - 1); 
     let temp: f64 = match num_part.trim().parse() {
         Ok(n) => n,
         Err(_) => {
@@ -80,7 +80,7 @@ fn parse_temperature(input: &str) -> Option<(f64, char)> {
     Some((temp, scale))
 }
 
-// Convert the temperature based on the given scale
+
 fn convert_temperature(temp: f64, scale: char) -> Option<(f64, f64, f64)> {
     match scale {
         'C' => Some((temp, (temp * 9.0 / 5.0) + 32.0, temp + 273.15)),
@@ -90,7 +90,7 @@ fn convert_temperature(temp: f64, scale: char) -> Option<(f64, f64, f64)> {
     }
 }
 
-// Function to print all converted temperatures
+
 fn print_converted_temps(temp_c: f64, temp_f: f64, temp_k: f64) {
     println!("Temp in C: {:.2}", temp_c);
     println!("Temp in F: {:.2}", temp_f);
