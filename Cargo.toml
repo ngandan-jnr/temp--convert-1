@@ -4,10 +4,9 @@ version = "0.1.0"
 authors = ["runner"]
 edition = "2021"
 
-[dependencies]
 clap = { version = "4.4", features = ["derive"] }
 
 [[bin]]
 name = "my-project"
-path = "src/main.rs"
+path = "src/main.rs" 
 
