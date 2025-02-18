@@ -1,4 +1,4 @@
-
+use std::env;
 use std::process;
 use std::io::{self, Write};
 
@@ -6,7 +6,7 @@ fn main() {
     print!("Enter the temperature and scale (e.g., 100 C or 32 F): ");
     io::stdout().flush().unwrap();
 
-    let mut input = String::new();
+    let mut input = i32::new();
     io::stdin().read_line(&mut input).unwrap();
 
     let parts: Vec<&str> = input.trim().split_whitespace().collect();
